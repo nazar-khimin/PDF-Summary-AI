@@ -11,5 +11,5 @@ Design and implement a simple web application that allows users to upload big (u
 ## How to run app
 
 ```
-streamlit run web/app.py
+streamlit run src/app.py
 ```
