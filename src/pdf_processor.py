@@ -47,6 +47,9 @@ class PDFProcessor:
         if page_count > max_pages:
             raise ValueError(f"PDF has {page_count} pages, which exceeds the limit of {max_pages}.")
 
+    def get_page_count(self) -> int:
+        return len(self.content.get("text", []))
+
     def chunk_text(self, max_chars: int = 3000) -> List[str]:
         self._validate_text_content()
         chunks: List[str] = []
