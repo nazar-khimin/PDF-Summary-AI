@@ -43,7 +43,7 @@ def load_pdf(uploaded_file):
     )
     return splitter.split_documents(docs)
 
-def summarize_documents(docs, llm, chain_type="stuff"):
+def summarize_documents(docs, llm, chain_type="map_reduce"):
     chain = load_summarize_chain(llm, chain_type=chain_type)
     return chain.invoke({"input_documents": docs})["output_text"]
 
