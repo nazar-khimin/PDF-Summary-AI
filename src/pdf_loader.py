@@ -4,8 +4,10 @@ from contextlib import contextmanager
 from langchain_community.document_loaders.parsers import LLMImageBlobParser
 from langchain_pymupdf4llm import PyMuPDF4LLMLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
+import pymupdf
 from openai_clients import get_gpt_4o_mini_llm
+
+MAX_PAGES_LIMIT = 100
 
 
 @contextmanager
@@ -24,6 +26,7 @@ def temp_pdf_file(uploaded_file):
 
 def load_pdf(uploaded_file):
     with temp_pdf_file(uploaded_file) as pdf_path:
+        validate_pdf_pages(pdf_path, MAX_PAGES_LIMIT)
         docs = PyMuPDF4LLMLoader(
             pdf_path,
             mode="page",
@@ -39,3 +42,9 @@ def load_pdf(uploaded_file):
         separators=["\n\n", "\n", ". ", " "]
     )
     return splitter.split_documents(docs)
+
+
+def validate_pdf_pages(pdf_path: str, max_pages: int) -> None:
+    with pymupdf.open(pdf_path) as doc:
+        if doc.page_count > max_pages:
+            raise ValueError(f"PDF has {doc.page_count} pages (limit {max_pages}).")
