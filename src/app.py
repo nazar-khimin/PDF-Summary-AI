@@ -9,52 +9,53 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# Load environment variables
+# Load env
 load_dotenv()
-
 st.title("📄 PDF Summarizer")
 
-# Modular PDF loading and splitting
 def load_pdf(uploaded_file):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-        tmp_file.write(uploaded_file.getbuffer())
-        tmp_path = tmp_file.name
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(uploaded_file.getbuffer())
+        tmp_path = tmp.name
 
     loader = PyMuPDF4LLMLoader(
         tmp_path,
-        mode='page',
+        mode="page",
         extract_images=True,
         images_parser=LLMImageBlobParser(
-            model=ChatOpenAI(model="gpt-5-mini", max_tokens=1024)
+            model=ChatOpenAI(
+                model="gpt-4o-mini",
+                temperature=0,
+                max_tokens=128
+            )
         ),
         table_strategy="lines_strict"
     )
-
-    documents = loader.load()
-
-    # Clean up temp file after loading
+    docs = loader.load()
     os.remove(tmp_path)
 
     splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-        encoding_name="o200k_base",
-        chunk_size=1800,
-        chunk_overlap=200,
-        separators=["\n\n", "\n", ". ", " ", ""]
+        encoding_name="cl100k_base",
+        chunk_size=1000,
+        chunk_overlap=100,
+        separators=["\n\n", "\n", ". ", " "]
     )
-    return splitter.split_documents(documents)
+    return splitter.split_documents(docs)
 
-# Summarization logic
 def summarize_documents(docs, llm, chain_type="stuff"):
     chain = load_summarize_chain(llm, chain_type=chain_type)
     return chain.invoke({"input_documents": docs})["output_text"]
 
-# File upload
 uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
-
-if uploaded_file is not None:
+if uploaded_file:
     docs = load_pdf(uploaded_file)
 
-    llm = ChatOpenAI(temperature=0, model_name="gpt-5-mini")
+    llm = ChatOpenAI(
+        model="gpt-5-mini",
+        temperature=0,
+        max_tokens=512
+    )
 
     if st.button("Summarize"):
         with st.spinner("Summarizing..."):
