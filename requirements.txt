@@ -6,3 +6,4 @@ langchain-openai==0.3.30
 python-dotenv
 langchain-pymupdf4llm==0.4.1
 langchain-text-splitters==0.3.9
+streamlit_pdf_viewer==0.0.26
