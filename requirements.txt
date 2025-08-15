@@ -4,3 +4,4 @@ langchain==0.3.27
 langchain_community==0.3.27
 langchain-openai==0.3.30
 python-dotenv
+langchain-pymupdf4llm==0.4.1

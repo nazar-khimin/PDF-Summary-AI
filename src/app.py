@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 import tempfile
 import os
 
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders.parsers import LLMImageBlobParser
+from langchain_pymupdf4llm import PyMuPDF4LLMLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 from langchain_openai import ChatOpenAI
@@ -19,7 +20,16 @@ def load_pdf(uploaded_file, chunk_size=1000, chunk_overlap=0):
         tmp_file.write(uploaded_file.getbuffer())
         tmp_path = tmp_file.name
 
-    loader = PyPDFLoader(tmp_path)
+    loader = PyMuPDF4LLMLoader(
+        tmp_path,
+        mode='page',
+        extract_images=True,
+        images_parser=LLMImageBlobParser(
+            model=ChatOpenAI(model="gpt-5-mini", max_tokens=1024)
+        ),
+        table_strategy="lines_strict"
+    )
+
     documents = loader.load()
 
     # Clean up temp file after loading
@@ -39,7 +49,7 @@ uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
 if uploaded_file is not None:
     docs = load_pdf(uploaded_file)
 
-    llm = ChatOpenAI(temperature=0, model_name="gpt-5-nano")  # Replace with your model
+    llm = ChatOpenAI(temperature=0, model_name="gpt-5-mini")
 
     if st.button("Summarize"):
         with st.spinner("Summarizing..."):
