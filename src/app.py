@@ -5,9 +5,9 @@ import os
 
 from langchain_community.document_loaders.parsers import LLMImageBlobParser
 from langchain_pymupdf4llm import PyMuPDF4LLMLoader
-from langchain.text_splitter import CharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 from langchain_openai import ChatOpenAI
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Load environment variables
 load_dotenv()
@@ -15,7 +15,7 @@ load_dotenv()
 st.title("📄 PDF Summarizer")
 
 # Modular PDF loading and splitting
-def load_pdf(uploaded_file, chunk_size=1000, chunk_overlap=0):
+def load_pdf(uploaded_file):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
         tmp_file.write(uploaded_file.getbuffer())
         tmp_path = tmp_file.name
@@ -35,7 +35,12 @@ def load_pdf(uploaded_file, chunk_size=1000, chunk_overlap=0):
     # Clean up temp file after loading
     os.remove(tmp_path)
 
-    splitter = CharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        encoding_name="o200k_base",
+        chunk_size=1800,
+        chunk_overlap=200,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
     return splitter.split_documents(documents)
 
 # Summarization logic
