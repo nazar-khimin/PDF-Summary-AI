@@ -2,7 +2,8 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from langchain.chains.summarize import load_summarize_chain
 from langchain_core.documents import Document
-from openai_clients import get_gpt_4o_mini_llm, get_gpt_5
+from openai_clients import get_gpt_4_mini_llm
+
 
 def summarize_pdf(docs):
     if not docs:
@@ -10,7 +11,7 @@ def summarize_pdf(docs):
 
     def summarize_chunk(doc):
         chain = load_summarize_chain(
-            llm=get_gpt_4o_mini_llm(),
+            llm=get_gpt_4_mini_llm(),
             chain_type="stuff"
         )
         result = chain.invoke({"input_documents": [doc]})
@@ -28,7 +29,7 @@ def summarize_pdf(docs):
 
     combined_doc = Document(page_content="\n\n".join(chunk_summaries))
     chain = load_summarize_chain(
-        llm=get_gpt_5(),
+        llm=get_gpt_4_mini_llm(),
         chain_type="stuff"
     )
     final_result = chain.invoke({"input_documents": [combined_doc]})

@@ -1,11 +1,14 @@
 import os
 import tempfile
 from contextlib import contextmanager
+
+import pymupdf
+
 from langchain_community.document_loaders.parsers import LLMImageBlobParser
 from langchain_pymupdf4llm import PyMuPDF4LLMLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-import pymupdf
-from openai_clients import get_gpt_4o_mini_llm
+
+from openai_clients import get_gpt_4_nano_llm
 
 MAX_PAGES_LIMIT = 100
 
@@ -31,7 +34,7 @@ def load_pdf(uploaded_file):
             pdf_path,
             mode="page",
             extract_images=True,
-            images_parser=LLMImageBlobParser(model=get_gpt_4o_mini_llm()),
+            images_parser=LLMImageBlobParser(model=get_gpt_4_nano_llm()),
             table_strategy="lines_strict"
         ).load()
 
