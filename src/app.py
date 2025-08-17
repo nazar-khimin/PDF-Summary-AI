@@ -30,9 +30,9 @@ if uploaded_pdf and uploaded_pdf.name != st.session_state.last_uploaded_name:
 if uploaded_pdf and st.button("Summarize"):
     with st.spinner(f"Summarizing {uploaded_pdf.name}…"):
         try:
-            pdf_bytes = uploaded_pdf.read()
-            pdf = load_pdf(io.BytesIO(pdf_bytes))
-            summary = summarize_pdf(pdf)
+            pdf_bytes: io.BytesIO = io.BytesIO(uploaded_pdf.read())
+            document_list = load_pdf(pdf_bytes)
+            summary = summarize_pdf(document_list)
             st.session_state.history.insert(0, {
                 "name": uploaded_pdf.name,
                 "summary": summary,

@@ -1,36 +1,27 @@
-from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
+from typing import Iterator
+
 from langchain.chains.summarize import load_summarize_chain
 from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 from openai_clients import get_gpt_4_mini_llm
 
 
-def summarize_pdf(docs):
-    if not docs:
+def summarize_pdf(documents: Iterator[Document]):
+    splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        encoding_name="cl100k_base",
+        chunk_size=1000,
+        chunk_overlap=100,
+        separators=["\n\n", "\n", ". ", " "]
+    )
+
+    splitter.split_documents(documents)
+
+    if not documents:
         return "No documents to summarize."
 
-    def summarize_chunk(doc):
-        chain = load_summarize_chain(
-            llm=get_gpt_4_mini_llm(),
-            chain_type="stuff"
-        )
-        result = chain.invoke({"input_documents": [doc]})
-        return result["output_text"]
-
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        chunk_summaries = list(
-            tqdm(
-                executor.map(summarize_chunk, docs),
-                total=len(docs),
-                desc="Summarizing chunks",
-                dynamic_ncols=True
-            )
-        )
-
-    combined_doc = Document(page_content="\n\n".join(chunk_summaries))
     chain = load_summarize_chain(
         llm=get_gpt_4_mini_llm(),
-        chain_type="stuff"
+        chain_type="map_reduce"
     )
-    final_result = chain.invoke({"input_documents": [combined_doc]})
-    return final_result["output_text"]
+    return chain.invoke({"input_documents": documents})["output_text"]
