@@ -1,4 +1,6 @@
 import tempfile
+from typing import Iterator
+
 import pymupdf
 
 from langchain_community.document_loaders.parsers import LLMImageBlobParser
@@ -18,7 +20,7 @@ def save_pdf_file(file) -> str:
     tmp.close()
     return tmp_path
 
-def load_pdf(pdf_path) -> list[Document]:
+def load_pdf(pdf_path) -> Iterator[Document]:
     validate_pdf_pages(pdf_path, MAX_PAGES_LIMIT)
     loader = PyMuPDF4LLMLoader(
         pdf_path,
@@ -27,7 +29,7 @@ def load_pdf(pdf_path) -> list[Document]:
         images_parser=LLMImageBlobParser(model=get_gpt_4_nano_llm()),
         table_strategy="lines_strict"
     )
-    return loader.load()
+    return loader.lazy_load()
 
 
 def validate_pdf_pages(pdf_path: str, max_pages: int) -> None:
