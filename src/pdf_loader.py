@@ -1,7 +1,6 @@
 import tempfile
 import pymupdf
 
-from typing import Iterator
 from langchain_community.document_loaders.parsers import LLMImageBlobParser
 from langchain_core.documents import Document
 from langchain_pymupdf4llm import PyMuPDF4LLMLoader
@@ -11,16 +10,15 @@ from openai_clients import get_gpt_4_nano_llm
 MAX_PAGES_LIMIT = 100
 
 
-def save_pdf_file(uploaded_file) -> str:
+def save_pdf_file(file) -> str:
     """Save uploaded file to a temp .pdf and return path."""
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    tmp.write(uploaded_file.getbuffer())
+    tmp.write(file.getbuffer())
     tmp_path = tmp.name
     tmp.close()
     return tmp_path
 
-def load_pdf(uploaded_file) -> Iterator[Document]:
-    pdf_path = save_pdf_file(uploaded_file)
+def load_pdf(pdf_path) -> list[Document]:
     validate_pdf_pages(pdf_path, MAX_PAGES_LIMIT)
     loader = PyMuPDF4LLMLoader(
         pdf_path,
@@ -29,8 +27,7 @@ def load_pdf(uploaded_file) -> Iterator[Document]:
         images_parser=LLMImageBlobParser(model=get_gpt_4_nano_llm()),
         table_strategy="lines_strict"
     )
-
-    return loader.lazy_load()
+    return loader.load()
 
 
 def validate_pdf_pages(pdf_path: str, max_pages: int) -> None:
