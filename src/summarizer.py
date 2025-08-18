@@ -12,6 +12,9 @@ def summarize_pdf(documents: Iterator[Document]):
     if not documents:
         raise ValueError("No documents provided for summarization.")
 
+    document_list = list(documents)
+    print_token_usage(document_list)
+
     initial_prompt = PromptTemplate(
         input_variables=["text"],
         template="Write a summary of this text:\n{text}"
@@ -31,12 +34,14 @@ def summarize_pdf(documents: Iterator[Document]):
         chain_type="refine",
         question_prompt = initial_prompt,
         refine_prompt = refine_prompt,
-        initial_response_name="existing_summary",
-        verbose=True
+        initial_response_name="existing_summary"
     )
-    document_list = list(documents)
-    print_token_usage(document_list)
-    return chain.invoke({"input_documents": document_list})["output_text"]
+
+    summary = chain.invoke({
+        "input_documents": document_list
+    })
+
+    return summary["output_text"]
 
 def get_token_count(doc: Document) -> int:
     encoding = get_encoding("cl100k_base")
