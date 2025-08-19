@@ -76,7 +76,7 @@ def get_style_by_length(page_count: int) -> str:
         "short": "Limit output to a single sentence (max 280 characters).",
         "medium": "Limit output to one concise paragraph (3–5 sentences).",
         "long": (
-            "Provide a detailed summary in **no more than 3 paragraphs**. "
+            "Provide a detailed summary in **no more than 2 paragraphs**. "
             "Include key trends, context, and nuances. "
             "Where helpful, add a short bullet list highlighting the most important points."
         )
