@@ -3,9 +3,9 @@ from typing import Iterator, List
 from langchain.chains.summarize import load_summarize_chain
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
+from tiktoken import get_encoding
 
 from openai_clients import get_gpt_4_mini_llm
-from tiktoken import get_encoding
 
 
 def summarize_pdf(documents: Iterator[Document]):
@@ -15,43 +15,56 @@ def summarize_pdf(documents: Iterator[Document]):
     document_list = list(documents)
     print_token_usage(document_list)
 
-    initial_prompt = ChatPromptTemplate.from_messages([
-        ("system", """Your name is PDF Summarizer. You are a professional summarizer who works with PDFs containing text, tables, and images. Your task is to create a concise and comprehensive summary of the provided content,
-     whether it's an article, finance analytics or conversation.
-     
-     Guidelines:
-     - Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness.
-     - Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects.
-     - When the input includes tabular data, analyze and interpret key trends or comparisons.
-     - When the input includes image descriptions or OCR, describe the visual content in context.
-     - Rely strictly on the provided content, without including external information.
-     - Format the summary in paragraph form for easy understanding.
+    # Length mode mapping
+    length_guidelines = {
+        "short": "Limit output to a single sentence (max 280 characters).",
+        "medium": "Limit output to one concise paragraph (3–5 sentences).",
+        "long": "Provide a detailed, thorough summary in multiple paragraphs, preserving key trends, context, and nuances."
+    }
+
+    def get_length_instruction(length_mode):
+        return length_guidelines.get(length_mode.lower())
+
+    # Processes each document chunk
+    map_prompt = ChatPromptTemplate.from_messages([
+        ("system", """Your name is PDF Summarizer. 
+    You are a professional summarizer who works with PDFs containing text, tables, and images.
+
+    Guidelines:
+    - {length_instruction}
+    - Maintain clarity, accuracy, and focus.
+    - Incorporate main ideas and essential information.
+    - When the input includes tabular data, interpret key trends or comparisons.
+    - When the input includes image descriptions or OCR, describe the visual content in context.
+    - Rely strictly on the provided content, with no external additions.
+    - Format according to the requested length style.
     """),
         ("human", "{task_instruction}:\n\n{text}")
     ])
 
-    refine_prompt = ChatPromptTemplate.from_messages([
-        ("system", """You are refining an existing summary based on new content from a PDF.  Update the summary to include any new insights, trends, or important details. 
-        Maintain clarity, conciseness, and structure. Do not repeat information.
+    # Merges the chunk summaries
+    combine_prompt = ChatPromptTemplate.from_messages([
+        ("system", """You are a summarization expert tasked with synthesizing multiple summaries into one cohesive, comprehensive summary.
 
-        Existing Summary:
-        {existing_summary}
-    
-        New Content:
-        {content}"""),
-            ("human", "{task_instruction}")
-        ])
+    Guidelines:
+    - {length_instruction}
+    - Integrate key insights from all summaries.
+    - Remove redundancy, ensure logical flow.
+    - Preserve clarity and match the requested length style.
+    """),
+        ("human", "{task_instruction}:\n\n{text}")
+    ])
 
     chain = load_summarize_chain(
         llm=get_gpt_4_mini_llm(),
-        chain_type="refine",
-        question_prompt=initial_prompt,
-        refine_prompt=refine_prompt,
-        document_variable_name = "text"
+        chain_type="map_reduce",
+        map_prompt=map_prompt,
+        combine_prompt=combine_prompt,
     )
 
     summary = chain.invoke({
-        "task_instruction" : "Summarize the following contents:",
+        "task_instruction": "Summarize the following contents:",
+        "length_instruction": get_length_instruction("short"),
         "input_documents": document_list
     })
 
