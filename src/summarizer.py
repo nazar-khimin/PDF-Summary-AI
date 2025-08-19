@@ -73,8 +73,14 @@ def get_style_by_length(page_count: int) -> str:
     Decide summary guideline based on page count and return the instruction text.
     """
     length_guidelines = {
-        "short": "Limit output to a single sentence (max 280 characters).",
-        "medium": "Limit output to one concise paragraph (3–5 sentences).",
+        "short": (
+            "Limit output to a single sentence (max 280 characters)."
+            "Where helpful, add a short bullet list highlighting the most important points."
+        ),
+        "medium": (
+            "Limit output to one concise paragraph (3–5 sentences)."
+            "Where helpful, add a short bullet list highlighting the most important points."
+        ),
         "long": (
             "Provide a detailed summary in **no more than 2 paragraphs**. "
             "Include key trends, context, and nuances. "
