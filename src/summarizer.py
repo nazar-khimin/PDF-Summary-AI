@@ -22,9 +22,6 @@ def summarize_pdf(documents: Iterator[Document]):
         "long": "Provide a detailed, thorough summary in multiple paragraphs, preserving key trends, context, and nuances."
     }
 
-    def get_length_instruction(length_mode):
-        return length_guidelines.get(length_mode.lower())
-
     # Processes each document chunk
     map_prompt = ChatPromptTemplate.from_messages([
         ("system", """Your name is PDF Summarizer. 
@@ -64,11 +61,36 @@ def summarize_pdf(documents: Iterator[Document]):
 
     summary = chain.invoke({
         "task_instruction": "Summarize the following contents:",
-        "length_instruction": get_length_instruction("short"),
+        "length_instruction": get_style_by_length(len(document_list)),
         "input_documents": document_list
     })
 
     return summary["output_text"]
+
+
+def get_style_by_length(page_count: int) -> str:
+    """
+    Decide summary guideline based on page count and return the instruction text.
+    """
+    length_guidelines = {
+        "short": "Limit output to a single sentence (max 280 characters).",
+        "medium": "Limit output to one concise paragraph (3–5 sentences).",
+        "long": (
+            "Provide a detailed summary in **no more than 3 paragraphs**. "
+            "Include key trends, context, and nuances. "
+            "Where helpful, add a short bullet list highlighting the most important points."
+        )
+    }
+
+    if page_count <= 2:
+        mode = "short"
+    elif page_count <= 10:
+        mode = "medium"
+    else:
+        mode = "long"
+
+    return length_guidelines[mode]
+
 
 def get_token_count(doc: Document) -> int:
     encoding = get_encoding("cl100k_base")
