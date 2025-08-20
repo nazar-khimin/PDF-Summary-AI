@@ -15,13 +15,6 @@ def summarize_pdf(documents: Iterator[Document]):
     document_list = list(documents)
     print_token_usage(document_list)
 
-    # Length mode mapping
-    length_guidelines = {
-        "short": "Limit output to a single sentence (max 280 characters).",
-        "medium": "Limit output to one concise paragraph (3–5 sentences).",
-        "long": "Provide a detailed, thorough summary in multiple paragraphs, preserving key trends, context, and nuances."
-    }
-
     # Processes each document chunk
     map_prompt = ChatPromptTemplate.from_messages([
         ("system", """Your name is PDF Summarizer. 
