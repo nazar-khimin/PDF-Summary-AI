@@ -29,21 +29,22 @@ class OpenAIClient:
         return file
 
 
-    def create_response(self, model: str, file_id: str, prompt: str):
+    def create_response(self, model: str, file_id: str):
         """
         Creates a response using a file and a text prompt.
         """
         response =  self.client.responses.create(
             model=model,
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "input_file", "file_id": file_id},
-                        {"type": "input_text", "text": prompt},
-                    ],
+            prompt={
+                "id": "pmpt_68ab80d02b608194af3ce2f4e514bf9203ed347458a5e0f8",
+                "version": "24",
+                "variables": {
+                    "reference_pdf": {
+                        "type": "input_file",
+                        "file_id": file_id,
+                    },
                 }
-            ]
+            }
         )
 
         return response.output_text
