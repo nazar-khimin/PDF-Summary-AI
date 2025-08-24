@@ -1,11 +1,9 @@
 import io
-from typing import Iterator
 
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_core.documents import Document
 from streamlit_pdf_viewer import pdf_viewer
-from pdf_loader import load_pdf, save_pdf_file
+from pdf_loader import load_pdf
 from summarizer import summarize_pdf
 
 load_dotenv()
@@ -32,15 +30,14 @@ if uploaded_pdf and uploaded_pdf.name != st.session_state.last_uploaded_name:
 
     # Save uploaded file immediately
     pdf_bytes: io.BytesIO = io.BytesIO(uploaded_pdf.read())
-    st.session_state.temp_path = save_pdf_file(pdf_bytes)
+    st.session_state.temp_path = load_pdf(pdf_bytes)
 
 # ─────────────────────────────────────────────────────────────
 # Summarize on button click
 if uploaded_pdf and st.button("Summarize"):
     with st.spinner(f"Summarizing {uploaded_pdf.name}…"):
         try:
-            document_list:Iterator[Document] = load_pdf(st.session_state.temp_path)
-            summary = summarize_pdf(document_list)
+            summary = summarize_pdf(st.session_state.temp_path)
             st.session_state.history.insert(0, {
                 "name": uploaded_pdf.name,
                 "summary": summary,
