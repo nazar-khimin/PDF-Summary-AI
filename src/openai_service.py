@@ -55,7 +55,7 @@ class OpenAIClient:
             data_source={
                 "type": "responses",
                 "source": {"type": "file_id", "id": file_id},
-                "model": "gpt-4o-mini",
+                "model": model,
                 "input_messages": {
                     "type": "template",
                     "template": [
