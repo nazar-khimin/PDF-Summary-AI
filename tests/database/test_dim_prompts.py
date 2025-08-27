@@ -1,5 +1,6 @@
 import pytest_check as check
 from src.database.models import DimPrompts
+from .fixtures import db_session
 
 
 class TestDimPrompts:

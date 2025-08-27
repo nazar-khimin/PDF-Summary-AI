@@ -4,7 +4,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from streamlit_pdf_viewer import pdf_viewer
 from pdf_loader import load_pdf
-from summarizer import summarize_pdf
+from summarizer import summarize_pdf, openroute_summarize_pdf
 
 load_dotenv()
 st.set_page_config(page_title="📄 PDF Summarizer", layout="centered")
@@ -37,7 +37,7 @@ if uploaded_pdf and uploaded_pdf.name != st.session_state.last_uploaded_name:
 if uploaded_pdf and st.button("Summarize"):
     with st.spinner(f"Summarizing {uploaded_pdf.name}…"):
         try:
-            summary = summarize_pdf(st.session_state.temp_path)
+            summary = openroute_summarize_pdf(st.session_state.temp_path)
             st.session_state.history.insert(0, {
                 "name": uploaded_pdf.name,
                 "summary": summary,
