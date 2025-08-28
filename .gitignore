@@ -1,8 +1,20 @@
+# Environment variables
 .env
+
+# Database files
 /inputs/db/
+
+# IDE files
 .idea
 .claude
 
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
+
+# System files
+.DS_Store
+
+# Temporary files
+tmp_*.jsonl
