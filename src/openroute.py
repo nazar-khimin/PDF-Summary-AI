@@ -1,9 +1,10 @@
 import base64
 from pathlib import Path
+
 from openai import OpenAI
 
 from config.env_variables import OPENROUTER_BASE_URL, OPENROUTER_API_KEY
-
+from database.facade.run_facade import save_run
 
 class OpenRouterClient:
 
@@ -75,11 +76,18 @@ class OpenRouterClient:
 if __name__ == "__main__":
     client = OpenRouterClient()
 
-    response = client.summarize_pdf(
-        model="google/gemma-3-27b-it",
-        pdf_path="/Users/nkhimin/PycharmProjects/PDF-Summary-AI/test_data/text_what_is_earth_science.pdf",
-        system_prompt="You are an expert assistant that extracts insights from complex PDFs, including tables and images.",
-        user_prompt="Summarize all key findings, preserving tables and images context where relevant.",
-    )
+    model = "google/gemma-3-27b-it"
+    pdf_path = "/Users/nkhimin/PycharmProjects/PDF-Summary-AI/test_data/text_what_is_earth_science.pdf"
+    system_prompt = "You are an expert assistant that extracts insights from complex PDFs, including tables and images."
+    user_prompt = "Summarize all key findings, preserving tables and images context where relevant."
 
+    response = client.summarize_pdf(
+        model=model,
+        pdf_path=pdf_path,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+    )
+    output:str = response.choices[0].message.content
+
+    save_run(pdf_path, model, system_prompt, user_prompt, output)
     print(response.choices[0].message.content)
