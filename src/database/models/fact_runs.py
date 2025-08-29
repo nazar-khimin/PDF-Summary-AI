@@ -2,10 +2,7 @@ from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
-
-from . import DimFiles, DimModels, DimPrompts, DimEvaluations
 from .base import Base
-
 
 class FactRuns(Base):
     __tablename__ = 'fact_runs'
@@ -21,10 +18,10 @@ class FactRuns(Base):
     created_at = Column(DateTime, server_default=func.now())
 
     # Relationships
-    file: "DimFiles" = relationship("DimFiles", back_populates="runs")
-    model: "DimModels" = relationship("DimModels", back_populates="runs")
-    prompt: "DimPrompts" = relationship("DimPrompts", back_populates="runs")
-    evaluations: list["DimEvaluations"] = relationship("DimEvaluations", back_populates="run")
+    file = relationship("DimFiles", back_populates="runs")
+    model = relationship("DimModels", back_populates="runs")
+    prompt = relationship("DimPrompts", back_populates="runs")
+    evaluations = relationship("DimEvaluations", back_populates="run")
 
     def __init__(self, file=None, model=None, prompt=None, output_length=None, processing_time=None, created_at=None):
         super().__init__()
