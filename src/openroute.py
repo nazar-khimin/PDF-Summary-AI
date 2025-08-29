@@ -4,7 +4,6 @@ from pathlib import Path
 from openai import OpenAI
 
 from config.env_variables import OPENROUTER_BASE_URL, OPENROUTER_API_KEY
-from database.facade.run_facade import save_run
 
 class OpenRouterClient:
 
