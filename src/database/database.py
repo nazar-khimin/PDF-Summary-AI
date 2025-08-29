@@ -22,7 +22,7 @@ engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Toggle this to True if you want to reset the database
-RESET_DATABASE = True
+RESET_DATABASE = False
 
 def create_tables():
     """Create all database tables if they don't exist"""
@@ -62,7 +62,3 @@ def with_db_session(func):
         with session_scope() as db:
             return func(*args, db=db, **kwargs)
     return wrapper
-
-def init_database():
-    """Initialize database with tables"""
-    create_tables()

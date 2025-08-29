@@ -13,7 +13,7 @@ class FactRuns(Base):
     prompt_id = Column(Integer, ForeignKey('dim_prompts.id'), nullable=True)
     output_length = Column(Integer, nullable=True)
     processing_time = Column(Float, nullable=True)  # in seconds
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
     
     # Relationships
     file = relationship("DimFiles", back_populates="runs")

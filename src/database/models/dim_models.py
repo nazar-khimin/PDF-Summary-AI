@@ -8,7 +8,7 @@ class DimModels(Base):
     __tablename__ = 'dim_models'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=True, unique=True)
+    name = Column(String(100), nullable=True)
     provider = Column(String(50), nullable=True)
     type = Column(String(50), nullable=True)
     created_at = Column(DateTime, default=datetime.now())
