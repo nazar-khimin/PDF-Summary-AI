@@ -8,11 +8,11 @@ class FactRuns(Base):
     __tablename__ = 'fact_runs'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    file_id = Column(Integer, ForeignKey('dim_files.id'), nullable=False)
-    model_id = Column(Integer, ForeignKey('dim_models.id'), nullable=False)
-    prompt_id = Column(Integer, ForeignKey('dim_prompts.id'), nullable=False)
-    output_length = Column(Integer, nullable=False)
-    processing_time = Column(Float, nullable=False)  # in seconds
+    file_id = Column(Integer, ForeignKey('dim_files.id'), nullable=True)
+    model_id = Column(Integer, ForeignKey('dim_models.id'), nullable=True)
+    prompt_id = Column(Integer, ForeignKey('dim_prompts.id'), nullable=True)
+    output_length = Column(Integer, nullable=True)
+    processing_time = Column(Float, nullable=True)  # in seconds
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

@@ -7,7 +7,7 @@ from datetime import datetime
 def save_run(pdf_path: str, model_name: str, system_prompt: str, user_prompt: str, output, db=None):
 
     # Create related objects
-    file_record = DimFiles(filepath=pdf_path)
+    file_record = DimFiles(filename=pdf_path)
     model_record = DimModels(name=model_name)
     prompt_record = DimPrompts(system_prompt=system_prompt, user_prompt=user_prompt)
 

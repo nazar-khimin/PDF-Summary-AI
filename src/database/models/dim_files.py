@@ -8,10 +8,10 @@ class DimFiles(Base):
     __tablename__ = 'dim_files'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    filename = Column(String(255), nullable=False)
-    filepath = Column(String(500), nullable=False)
-    size_bytes = Column(BigInteger, nullable=False)
-    page_count = Column(Integer, nullable=False)
+    filename = Column(String(255), nullable=True)
+    filepath = Column(String(500), nullable=True)
+    size_bytes = Column(BigInteger, nullable=True)
+    page_count = Column(Integer, nullable=True)
     token_count = Column(Integer, nullable=True)
     image_count = Column(Integer, nullable=True)
     table_count = Column(Integer, nullable=True)

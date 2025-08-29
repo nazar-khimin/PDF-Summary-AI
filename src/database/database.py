@@ -21,8 +21,14 @@ engine = create_engine(DATABASE_URL, echo=False)
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Toggle this to True if you want to reset the database
+RESET_DATABASE = True
+
 def create_tables():
     """Create all database tables if they don't exist"""
+    if RESET_DATABASE:
+        logger.warning("Resetting database: dropping all tables.")
+        Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
 def get_db_session():
@@ -32,6 +38,7 @@ def get_db_session():
 @contextmanager
 def session_scope():
     """Provide a transactional scope around a series of operations."""
+    create_tables()  # Ensures tables exist (or are reset if flag is True)
     db = get_db_session()
     try:
         yield db

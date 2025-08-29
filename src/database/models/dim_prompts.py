@@ -9,7 +9,7 @@ class DimPrompts(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     system_prompt = Column(Text, nullable=True)
-    user_prompt = Column(Text, nullable=False)
+    user_prompt = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationship to fact table
